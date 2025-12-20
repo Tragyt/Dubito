@@ -11,5 +11,6 @@ public class ServerMain {
 
         Registry registry = LocateRegistry.createRegistry(1099);
         registry.rebind("ServerService", stub);
+        System.out.println("Server started!");
     }
 }
