@@ -5,7 +5,7 @@ import java.rmi.registry.Registry;
 
 public class ClientMain {
     public static void main(String[] args) throws NotBoundException, RemoteException {
-        Registry registry = LocateRegistry.getRegistry();
+        Registry registry = LocateRegistry.getRegistry("rmi-server");
         Service server = (Service) registry.lookup("ServerService");
 
         String response = server.sendMessage("message");

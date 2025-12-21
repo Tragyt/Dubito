@@ -1,11 +1,10 @@
 FROM eclipse-temurin:17-jdk
 WORKDIR /app
 
-COPY Server ./server
+COPY Client ./client
 COPY common ./common
 
 RUN javac -d out \
     $(find common/src -name "*.java") \
-    $(find server/src -name "*.java")
-
-CMD ["java", "-cp", "out", "ServerMain"]
+    $(find client/src -name "*.java")
+CMD ["java", "-cp", "out", "ClientMain"]

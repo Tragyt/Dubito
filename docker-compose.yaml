@@ -1,0 +1,20 @@
+services:
+  rmi-server:
+    build: 
+      context: .
+      dockerfile: Server/Dockerfile
+    container_name: rmi-server
+    networks:
+      - rmi-net
+  
+  rmi-client:
+    build: 
+      context: .
+      dockerfile: Client/Dockerfile
+    container_name: rmi-client
+    networks:
+      - rmi-net
+
+networks:
+  rmi-net:
+    driver: bridge
