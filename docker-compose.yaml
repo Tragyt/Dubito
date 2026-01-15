@@ -1,19 +1,21 @@
 services:
-  rmi-server:
+  gameserver:
     build: 
       context: .
       dockerfile: Server/Dockerfile
-    container_name: rmi-server
+    container_name: gameserver
     networks:
       - rmi-net
   
-  rmi-client:
+  player1:
     build: 
       context: .
       dockerfile: Client/Dockerfile
-    container_name: rmi-client
+    container_name: player1
     networks:
       - rmi-net
+    environment:
+      - PLAYER_NAME=pippo
 
 networks:
   rmi-net:

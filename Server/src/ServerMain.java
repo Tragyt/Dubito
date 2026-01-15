@@ -6,11 +6,11 @@ import java.rmi.server.UnicastRemoteObject;
 public class ServerMain {
 
     public static void main(String[] args) throws RemoteException {
-        Service service = new ServiceImpl();
-        Service stub = (Service) UnicastRemoteObject.exportObject(service, 0);
+        GameService gameService = new GameServiceImpl();
+        GameService stub = (GameService) UnicastRemoteObject.exportObject(gameService, 0);
 
         Registry registry = LocateRegistry.createRegistry(1099);
-        registry.rebind("ServerService", stub);
-        System.out.println("Server started!");
+        registry.rebind("GameService", stub);
+        System.out.println("GameServer started!");
     }
 }
