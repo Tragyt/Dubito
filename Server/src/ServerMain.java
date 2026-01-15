@@ -6,8 +6,6 @@ import java.rmi.server.UnicastRemoteObject;
 public class ServerMain {
 
     public static void main(String[] args) throws RemoteException {
-        // System.setProperty("java.rmi.server.hostname", "server");
-
         Service service = new ServiceImpl();
         Service stub = (Service) UnicastRemoteObject.exportObject(service, 0);
 
