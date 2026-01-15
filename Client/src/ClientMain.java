@@ -3,9 +3,11 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Optional;
+import java.util.Scanner;
+
 
 public class ClientMain {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, RemoteException {
         GameService server;
         while (true) {
             try {
@@ -17,18 +19,14 @@ public class ClientMain {
                 Thread.sleep(2000);
             }
         }
+        Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Server trovato, tentativo di unirsi alla partita in corso...");
-        String playername = Optional.ofNullable(System.getenv("PLAYER_NAME")).orElse("guest");
+        System.out.print(
+                "Server trovato, inserisci il tuo nickname\n> ");
+        String playername = Optional.of(scanner.nextLine().trim()).filter(s -> !s.isEmpty()).orElse("guest");
         GameClientImpl player = new GameClientImpl(playername);
-        try {
-            server.JoinGame(player);
-            System.out.print("Ingresso riuscito, in attesa di altri giocatori...");
-        } catch (LobbyFullException e) {
-            System.out.println("Impossibile unirsi al server: " + e.getMessage());
-            System.exit(0);
-        } catch (RemoteException e) {
-            System.out.println("Si è verificato un errore durante la connessione al server");
-        }
+        server.JoinGame(player);
+
+        scanner.close();
     }
 }

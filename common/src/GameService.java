@@ -2,5 +2,5 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface GameService extends Remote {
-    void JoinGame(GameClient playername) throws RemoteException, LobbyFullException;
+    void JoinGame(GameClient playername) throws RemoteException;
 }

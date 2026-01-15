@@ -6,16 +6,20 @@ services:
     container_name: gameserver
     networks:
       - rmi-net
+    environment:
+      - APP_ENV=dev
   
-  player1:
+  player:
     build: 
       context: .
       dockerfile: Client/Dockerfile
-    container_name: player1
+    container_name: player
     networks:
       - rmi-net
     environment:
-      - PLAYER_NAME=pippo
+      - APP_ENV=dev
+    stdin_open: true   
+    tty: true
 
 networks:
   rmi-net:

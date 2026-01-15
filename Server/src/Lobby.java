@@ -1,31 +1,69 @@
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Lobby {
     private static final int MAX_PLAYERS = 4;
     private ArrayList<GameClient> players;
+    private boolean gameStarted;
+    private Map<GameClient, DiceCup> playerCups;
+    private int rotationIndex;
 
     public Lobby() {
         players = new ArrayList<>();
+        gameStarted = false;
+        playerCups = new HashMap<>();
+        rotationIndex = 0;
     }
 
-    public void newPlayer(GameClient player) throws LobbyFullException{
-        if(getPlayerNumber() <= MAX_PLAYERS)
-            players.add(player);
-        else
-            throw new LobbyFullException("Lobby is full");
+    public void newPlayer(GameClient player) throws RemoteException {
+        players.add(player);
+        playerCups.put(player, new DiceCup());
+        System.out.println(player.getName() + " joined the lobby");
+        player.lobbyJoined();
     }
 
-    public int getPlayerNumber(){
+    public int getPlayerNumber() {
         return players.size();
     }
 
-    public boolean isFull(){
-        return getPlayerNumber() == MAX_PLAYERS;
+    public boolean isFull() {
+        return players.size() == MAX_PLAYERS;
     }
 
-    public void startGame() throws RemoteException{
-        for(GameClient player: players)
-            player.onGameStart();
+    public void startGame() throws RemoteException {
+        gameStarted = true;
+        for (GameClient player : players)
+            player.onGameStart(players);
+        Collections.shuffle(players);
+
+        while (players.size() > 1) {
+            flipCups();
+
+        }
     }
+
+    public boolean isGameStarted() {
+        return gameStarted;
+    }
+
+    public ArrayList<GameClient> getPlayers() {
+        return players;
+    }
+
+    private void deletePlayer(GameClient player) {
+        players.remove(player);
+        playerCups.remove(player);
+    }
+
+    private void flipCups() throws RemoteException {
+        for (Map.Entry<GameClient, DiceCup> playerCup : playerCups.entrySet()) {
+            GameClient player = playerCup.getKey();
+            DiceCup cup = playerCup.getValue();
+            player.flipped(cup.flip());
+        }
+    }
+
 }
