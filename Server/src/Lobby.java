@@ -35,13 +35,13 @@ public class Lobby {
 
     public void startGame() throws RemoteException {
         gameStarted = true;
+        Collections.shuffle(players);
         for (GameClient player : players)
             player.onGameStart(players);
-        Collections.shuffle(players);
 
         while (players.size() > 1) {
             flipCups();
-
+            
         }
     }
 
@@ -56,6 +56,7 @@ public class Lobby {
     private void deletePlayer(GameClient player) {
         players.remove(player);
         playerCups.remove(player);
+        //gestione index
     }
 
     private void flipCups() throws RemoteException {
