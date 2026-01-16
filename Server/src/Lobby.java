@@ -39,9 +39,12 @@ public class Lobby {
         for (GameClient player : players)
             player.onGameStart(players);
 
-        while (players.size() > 1) {
-            flipCups();
-            
+        Game game = new Game(players);
+        GameClient winner = game.startGame();
+        winner.youWon();
+        for (GameClient player : players) {
+            if (player != winner)
+                player.winner(winner.getName());
         }
     }
 
@@ -51,20 +54,6 @@ public class Lobby {
 
     public ArrayList<GameClient> getPlayers() {
         return players;
-    }
-
-    private void deletePlayer(GameClient player) {
-        players.remove(player);
-        playerCups.remove(player);
-        //gestione index
-    }
-
-    private void flipCups() throws RemoteException {
-        for (Map.Entry<GameClient, DiceCup> playerCup : playerCups.entrySet()) {
-            GameClient player = playerCup.getKey();
-            DiceCup cup = playerCup.getValue();
-            player.flipped(cup.flip());
-        }
     }
 
 }

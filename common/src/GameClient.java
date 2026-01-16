@@ -16,8 +16,15 @@ public interface GameClient extends Remote {
 
     Map.Entry<Integer, Integer> move(Map.Entry<Integer, Integer> lastMove) throws RemoteException;
 
-     Map.Entry<Integer, Integer> firstMove() throws RemoteException;
+    Map.Entry<Integer, Integer> firstMove() throws RemoteException;
 
-    void opponentMove(Map.Entry<String, Map.Entry<Integer, Integer>> move) throws RemoteException;
+    void opponentMove(String player, Map.Entry<Integer, Integer> move) throws RemoteException;
 
+    void winner(String player) throws RemoteException;
+
+    void youWon() throws RemoteException;
+
+    void youLost() throws RemoteException;
+
+    void diceLost(int dicesLeft) throws RemoteException;
 }

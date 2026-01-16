@@ -69,14 +69,11 @@ public class GameClientImpl extends UnicastRemoteObject implements GameClient {
             }
             if (move.matches("^\\d \\d$")) {
                 String[] splitted = move.split(" ");
-                int nDices = Integer.parseInt(splitted[0]);
-                int face = Integer.parseInt(splitted[1]);
-
-                if(last_face==1 && !((face==1 && nDices > last_nDices) || (face>) ) )
-
-                ret = Map.entry(nDices, face);
-                break;
+                ret = Map.entry(Integer.parseInt(splitted[0]), Integer.parseInt(splitted[1]));
+                if (GameHelper.validateMove(ret, lastMove))
+                    break;
             }
+            System.out.println("Mossa illegale, riprova");
         }
         scanner.close();
 
@@ -85,12 +82,49 @@ public class GameClientImpl extends UnicastRemoteObject implements GameClient {
 
     @Override
     public Map.Entry<Integer, Integer> firstMove() {
-        return null;
+        System.out.println(
+                "Inizi te, digita [numero di dadi] [faccia dadi], il primo turno non puoi chiamare paco ([1] come faccia)");
+
+        Map.Entry<Integer, Integer> ret;
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            String move = scanner.nextLine();
+            if (move.matches("^\\d \\d$")) {
+                String[] splitted = move.split(" ");
+                ret = Map.entry(Integer.parseInt(splitted[0]), Integer.parseInt(splitted[1]));
+                if (GameHelper.validateMove(ret, Map.entry(0, 0)))
+                    break;
+            }
+            System.out.println("Mossa illegale, riprova");
+        }
+        scanner.close();
+
+        return ret;
     }
 
     @Override
-    public void opponentMove(Map.Entry<String, Map.Entry<Integer, Integer>> move) {
-        System.out.println("Secondo " + move.getKey() + " ci sono almeno (numero dadi): " + move.getValue().getKey()
-                + " (faccia dado): " + move.getValue().getValue());
+    public void opponentMove(String player, Map.Entry<Integer, Integer> move) {
+        System.out.println("Secondo " + player + " ci sono almeno (numero dadi): " + move.getKey()
+                + " (faccia dado): " + move.getValue());
+    }
+
+    @Override
+    public void youWon() {
+        System.out.println("Congratulazioni, hai vinto");
+    }
+
+    @Override
+    public void winner(String winner) {
+        System.out.println("Il vincitore è" + winner + "!!");
+    }
+
+    @Override
+    public void youLost() {
+        System.out.println("Hai perso, sei stato eliminato");
+    }
+
+    @Override
+    public void diceLost(int dicesLeft) {
+        System.out.println("Hai perso un dado, te ne rimangono ancora " + dicesLeft);
     }
 }
