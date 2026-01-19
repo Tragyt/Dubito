@@ -8,7 +8,7 @@ public class GameServiceImpl extends UnicastRemoteObject implements GameService 
     private final Lobby lobby;
     private ScheduledFuture<?> countdown;
     private boolean countdownStarted;
-    private static final int COUNTDOWN_SECONDS = 30;
+    private static final int COUNTDOWN_SECONDS = 10;
 
     public GameServiceImpl() throws RemoteException {
         lobby = new Lobby();
@@ -51,11 +51,13 @@ public class GameServiceImpl extends UnicastRemoteObject implements GameService 
     }
 
     private synchronized void startGame() {
-        System.out.println("Game started!");
-        try {
-            lobby.startGame();
-        } catch (RemoteException e) {
-            System.out.println("Si è verificato un errore");
-        }
+        System.out.println("Inizia la partita!");
+        new Thread(() -> {
+            try {
+                lobby.startGame();
+            } catch (RemoteException e) {
+                System.out.println("Si è verificato un errore");
+            }
+        }).start();
     }
 }

@@ -9,6 +9,6 @@ public class ServerMain {
 
         Registry registry = LocateRegistry.createRegistry(1099);
         registry.rebind("GameService", gameService);
-        System.out.println("GameServer started!");
+        System.out.println("GameServer partito!");
     }
 }

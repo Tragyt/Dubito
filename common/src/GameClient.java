@@ -14,9 +14,9 @@ public interface GameClient extends Remote {
 
     void flipped(ArrayList<Integer> dices) throws RemoteException;
 
-    Map.Entry<Integer, Integer> move(Map.Entry<Integer, Integer> lastMove) throws RemoteException;
+    void move(Map.Entry<Integer, Integer> lastMove) throws RemoteException;
 
-    Map.Entry<Integer, Integer> firstMove() throws RemoteException;
+    void firstMove() throws RemoteException;
 
     void opponentMove(String player, Map.Entry<Integer, Integer> move) throws RemoteException;
 
@@ -27,4 +27,8 @@ public interface GameClient extends Remote {
     void youLost() throws RemoteException;
 
     void diceLost(int dicesLeft) throws RemoteException;
+
+    void imbroglio() throws RemoteException;
+
+    void endTurn(String looser, int dicesLeft, int faceCalled, int facesRealNumber) throws RemoteException;
 }

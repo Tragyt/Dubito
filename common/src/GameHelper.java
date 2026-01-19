@@ -8,8 +8,11 @@ public class GameHelper {
         int face = currentMove.getValue();
 
         // mosse illegali
-        if (nDices <= 0 || face <= 0 || face > 6 || (face == last_face && nDices == last_nDices))
+        if (nDices < 0 || face < 0 || face > 6 || (face == last_face && nDices == last_nDices))
             return false;
+
+        if (nDices == 0 && face == 0) // dubito
+            return true;
 
         if (last_face == 1) // se l'ultima mossa era paco
         {

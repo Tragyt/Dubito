@@ -9,19 +9,17 @@ public class Lobby {
     private ArrayList<GameClient> players;
     private boolean gameStarted;
     private Map<GameClient, DiceCup> playerCups;
-    private int rotationIndex;
 
     public Lobby() {
         players = new ArrayList<>();
         gameStarted = false;
         playerCups = new HashMap<>();
-        rotationIndex = 0;
     }
 
     public void newPlayer(GameClient player) throws RemoteException {
         players.add(player);
         playerCups.put(player, new DiceCup());
-        System.out.println(player.getName() + " joined the lobby");
+        System.out.println(player.getName() + " entra nella lobby");
         player.lobbyJoined();
     }
 

@@ -27,6 +27,10 @@ public class DiceCup {
     }
 
     public int numberOf(int n) {
-        return (int) dices.stream().filter(i -> i == n).count();
+        return (int) dices.stream().filter(i -> i == n || i == 1).count();
+    }
+
+    public void disqualify() {
+        diceNumber = 0;
     }
 }

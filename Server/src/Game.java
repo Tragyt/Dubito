@@ -7,10 +7,12 @@ public class Game {
     private ArrayList<GameClient> players;
     private Map<GameClient, DiceCup> playerCups;
     private int rotationIndex;
+    private int playersInGame;
 
     public Game(ArrayList<GameClient> players) {
         this.players = players;
         rotationIndex = 0;
+        playersInGame = players.size();
 
         playerCups = new HashMap<>();
         for (GameClient player : players)
@@ -18,7 +20,7 @@ public class Game {
     }
 
     public GameClient startGame() throws RemoteException {
-        while (players.size() > 1) {
+        while (playersInGame > 1) {
 
             Turno turn = new Turno(players, playerCups, rotationIndex);
             int rotationIndex = turn.startTurn();
@@ -27,15 +29,10 @@ public class Game {
             looser.diceLost(dicesLeft);
             if (dicesLeft == 0) {
                 looser.youLost();
-                deletePlayer(looser);
+                playersInGame--;
             }
         }
         return players.get(0); // return winner
     }
 
-    private void deletePlayer(GameClient player) {
-        players.remove(player);
-        playerCups.remove(player);
-        rotationIndex = rotationIndex % players.size();
-    }
 }

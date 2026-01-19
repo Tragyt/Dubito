@@ -5,7 +5,6 @@ import java.rmi.registry.Registry;
 import java.util.Optional;
 import java.util.Scanner;
 
-
 public class ClientMain {
     public static void main(String[] args) throws InterruptedException, RemoteException {
         GameService server;
@@ -24,9 +23,9 @@ public class ClientMain {
         System.out.print(
                 "Server trovato, inserisci il tuo nickname\n> ");
         String playername = Optional.of(scanner.nextLine().trim()).filter(s -> !s.isEmpty()).orElse("guest");
+        scanner.close();
         GameClientImpl player = new GameClientImpl(playername);
         server.JoinGame(player);
-
-        scanner.close();
+        player.startInputLoop();
     }
 }
