@@ -18,13 +18,13 @@ public class ClientMain {
                 Thread.sleep(2000);
             }
         }
+        @SuppressWarnings("resource")
         Scanner scanner = new Scanner(System.in);
 
         System.out.print(
                 "Server trovato, inserisci il tuo nickname\n> ");
         String playername = Optional.of(scanner.nextLine().trim()).filter(s -> !s.isEmpty()).orElse("guest");
-        scanner.close();
-        GameClientImpl player = new GameClientImpl(playername);
+        GameClientImpl player = new GameClientImpl(playername, server);
         server.JoinGame(player);
         player.startInputLoop();
     }

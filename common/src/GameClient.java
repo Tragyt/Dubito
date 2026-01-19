@@ -1,7 +1,6 @@
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Map;
 
 public interface GameClient extends Remote {
     String getName() throws RemoteException;
@@ -14,11 +13,11 @@ public interface GameClient extends Remote {
 
     void flipped(ArrayList<Integer> dices) throws RemoteException;
 
-    void move(Map.Entry<Integer, Integer> lastMove) throws RemoteException;
+    void move(Raise lastMove) throws RemoteException;
 
     void firstMove() throws RemoteException;
 
-    void opponentMove(String player, Map.Entry<Integer, Integer> move) throws RemoteException;
+    void opponentMove(Move move) throws RemoteException;
 
     void winner(String player) throws RemoteException;
 
@@ -31,4 +30,6 @@ public interface GameClient extends Remote {
     void imbroglio() throws RemoteException;
 
     void endTurn(String looser, int dicesLeft, int faceCalled, int facesRealNumber) throws RemoteException;
+
+    void notYourTurn() throws RemoteException;
 }

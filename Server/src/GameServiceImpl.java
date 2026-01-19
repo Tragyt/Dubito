@@ -60,4 +60,9 @@ public class GameServiceImpl extends UnicastRemoteObject implements GameService 
             }
         }).start();
     }
+
+    @Override
+    public void playerMove(Move move) throws RemoteException {
+        lobby.getGame().getTurn().playerMoves(move);
+    }
 }

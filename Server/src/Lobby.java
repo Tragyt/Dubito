@@ -1,24 +1,20 @@
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 public class Lobby {
-    private static final int MAX_PLAYERS = 4;
-    private ArrayList<GameClient> players;
+    private static final int MAX_PLAYERS = 2;
+    private LinkedHashMap<GameClient, DiceCup> players;
     private boolean gameStarted;
-    private Map<GameClient, DiceCup> playerCups;
+    private Game game;
 
     public Lobby() {
-        players = new ArrayList<>();
+        players = new LinkedHashMap<>();
         gameStarted = false;
-        playerCups = new HashMap<>();
     }
 
     public void newPlayer(GameClient player) throws RemoteException {
-        players.add(player);
-        playerCups.put(player, new DiceCup());
+        players.put(player, new DiceCup());
         System.out.println(player.getName() + " entra nella lobby");
         player.lobbyJoined();
     }
@@ -33,16 +29,17 @@ public class Lobby {
 
     public void startGame() throws RemoteException {
         gameStarted = true;
-        Collections.shuffle(players);
-        for (GameClient player : players)
-            player.onGameStart(players);
+        ArrayList<GameClient> clients = new ArrayList<>(players.keySet());
+        for (GameClient player : clients)
+            player.onGameStart(clients);
 
-        Game game = new Game(players);
+        game = new Game(players);
         GameClient winner = game.startGame();
         winner.youWon();
-        for (GameClient player : players) {
+        for (GameClient player : players.keySet()) {
             if (player != winner)
                 player.winner(winner.getName());
+            gameStarted = false;
         }
     }
 
@@ -50,8 +47,7 @@ public class Lobby {
         return gameStarted;
     }
 
-    public ArrayList<GameClient> getPlayers() {
-        return players;
+    public Game getGame() {
+        return game;
     }
-
 }

@@ -1,38 +1,47 @@
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Game {
-    private ArrayList<GameClient> players;
-    private Map<GameClient, DiceCup> playerCups;
+    private LinkedHashMap<GameClient, DiceCup> players;
     private int rotationIndex;
     private int playersInGame;
+    private Turno turn;
 
-    public Game(ArrayList<GameClient> players) {
+    public Game(LinkedHashMap<GameClient, DiceCup> players) {
         this.players = players;
         rotationIndex = 0;
         playersInGame = players.size();
-
-        playerCups = new HashMap<>();
-        for (GameClient player : players)
-            playerCups.put(player, new DiceCup());
     }
 
     public GameClient startGame() throws RemoteException {
+        ArrayList<Map.Entry<GameClient, DiceCup>> lst = new ArrayList<>(players.entrySet());
         while (playersInGame > 1) {
+            turn = new Turno(players, rotationIndex);
+            rotationIndex = turn.startTurn();
 
-            Turno turn = new Turno(players, playerCups, rotationIndex);
-            int rotationIndex = turn.startTurn();
-            GameClient looser = players.get(rotationIndex);
-            int dicesLeft = playerCups.get(looser).removeDice();
+            Map.Entry<GameClient, DiceCup> entry = lst.get(rotationIndex);
+            int dicesLeft = entry.getValue().removeDice();
+            GameClient looser = entry.getKey();
             looser.diceLost(dicesLeft);
             if (dicesLeft == 0) {
                 looser.youLost();
                 playersInGame--;
             }
         }
-        return players.get(0); // return winner
+        return getWinner();
     }
 
+    public Turno getTurn() {
+        return turn;
+    }
+
+    private GameClient getWinner() {
+        for (Map.Entry<GameClient, DiceCup> entry : players.entrySet()) {
+            if (entry.getValue().getDiceNumber() > 0)
+                return entry.getKey();
+        }
+        return null;
+    }
 }

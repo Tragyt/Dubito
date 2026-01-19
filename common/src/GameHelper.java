@@ -1,18 +1,31 @@
-import java.util.Map;
 
 public class GameHelper {
-    public static boolean validateMove(Map.Entry<Integer, Integer> currentMove, Map.Entry<Integer, Integer> lastMove) {
-        int last_nDices = lastMove.getKey();
-        int last_face = lastMove.getValue();
-        int nDices = currentMove.getKey();
-        int face = currentMove.getValue();
+    public static boolean validateMove(Move currentMove, Move lastMove) {
+
+        if (lastMove != null && lastMove instanceof Doubt) // non può esserci una mossa dopo un dubito
+        {
+            System.out.println("[Error]Mossa dopo dubito");
+            return false;
+        }
+
+        if (currentMove instanceof Doubt && lastMove == null) // non si può dubitare come prima mossa
+        {
+            System.out.println("[Error]Dubito come prima mossa");
+            return false;
+        }
+        if (currentMove instanceof Doubt) // non serve confronto con mossa precedente
+            return true;
+
+        Raise lastRaise = (Raise) lastMove;
+        Raise currentRaise = (Raise) currentMove;
+        int last_nDices = lastMove != null ? lastRaise.getDicesNumber() : 0;
+        int last_face = lastMove != null ? lastRaise.getFace() : 0;
+        int nDices = currentRaise.getDicesNumber();
+        int face = currentRaise.getFace();
 
         // mosse illegali
-        if (nDices < 0 || face < 0 || face > 6 || (face == last_face && nDices == last_nDices))
+        if (nDices <= 0 || face <= 0 || face > 6 || (face == last_face && nDices == last_nDices))
             return false;
-
-        if (nDices == 0 && face == 0) // dubito
-            return true;
 
         if (last_face == 1) // se l'ultima mossa era paco
         {
@@ -25,8 +38,12 @@ public class GameHelper {
         }
 
         if (face == 1) // se la nuova mossa è paco
+        {
+            if (last_nDices == 0)
+                return false;
             // il numero di dadi dev'essere maggiore della metà
             return nDices > (last_nDices / 2);
+        }
 
         // almeno uno dei due valori dev'essere aumentato
         return (face >= last_face && nDices >= last_nDices);
