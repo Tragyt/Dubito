@@ -39,8 +39,9 @@ public class Lobby {
         for (GameClient player : players.keySet()) {
             if (player != winner)
                 player.winner(winner.getName());
-            gameStarted = false;
         }
+        gameStarted = false;
+        players = new LinkedHashMap<>();
     }
 
     public boolean isGameStarted() {
