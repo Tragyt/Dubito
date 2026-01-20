@@ -11,8 +11,8 @@ public class Game {
 
     public Game(LinkedHashMap<GameClient, DiceCup> players) {
         this.players = players;
-        rotationIndex = 0;
         playersInGame = players.size();
+        rotationIndex = (int) (Math.random() * playersInGame);
     }
 
     public GameClient startGame() throws RemoteException {
