@@ -15,10 +15,7 @@ public class GameClientImpl extends UnicastRemoteObject implements GameClient {
         RED("\u001B[31m"),
         GREEN("\u001B[32m"),
         YELLOW("\u001B[33m"),
-        BLUE("\u001B[34m"),
-        BOLD("\u001B[1m"),
-        UNDERLINE("\u001B[4m"),
-        BG_RED("\u001B[41m");
+        BLUE("\u001B[34m");
 
         private final String code;
 
