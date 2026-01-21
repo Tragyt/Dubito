@@ -9,14 +9,12 @@ public class Turno {
     private volatile GameClient currentTurn;
     private volatile Move currentMove;
 
-    public Turno(LinkedHashMap<GameClient, DiceCup> players, int rotationIndex)
-            throws RemoteException {
+    public Turno(LinkedHashMap<GameClient, DiceCup> players, int rotationIndex) {
         this.players = players;
         this.rotationIndex = rotationIndex;
     }
 
-    public int startTurn() throws RemoteException {
-
+    public int startTurn() {
         flipCups();
         System.out.println("Inizia il turno");
         currentTurn = nextPlayer();
@@ -27,6 +25,10 @@ public class Turno {
             currentTurn = nextPlayer();
             lastMove = (Raise) currentMove;
             setCurrentMove(lastMove);
+        }
+
+        if (lastMove == null || currentMove.getPlayer() == null) {
+            return -1;
         }
 
         ArrayList<GameClient> lst = new ArrayList<>(players.keySet());
@@ -42,21 +44,49 @@ public class Turno {
             rotationIndex = lst.indexOf(currentTurn);
 
         GameClient looser = lst.get(rotationIndex);
-        System.out.println(looser.getName() + " perde un dado");
         DiceCup looserCup = players.get(looser);
-        for (GameClient player : players.keySet())
-            player.endTurn(looser.getName(), looserCup.getDiceNumber() - 1, face, tot);
+        System.out.println(looserCup.getPlayername() + " perde un dado");
+
+        for (Map.Entry<GameClient, DiceCup> entry : players.entrySet()) {
+            GameClient player = entry.getKey();
+            if (!entry.getValue().isCrashed()) {
+                try {
+                    player.endTurn(looserCup.getPlayername(), looserCup.getDiceNumber() - 1, face, tot);
+                } catch (RemoteException e) {
+                    Lobby.payerCrashed(player, players);
+                }
+            }
+        }
+
         return rotationIndex;
     }
 
-    private void setCurrentMove(Raise lastMove) throws RemoteException {
+    private void setCurrentMove(Raise lastMove) {
         currentMove = null;
-        if (lastMove == null)
-            currentTurn.firstMove();
-        else
-            currentTurn.move(lastMove);
+        try {
+            if (lastMove == null)
+                currentTurn.firstMove();
+            else
+                currentTurn.move(lastMove);
+        } catch (RemoteException e) {
+            Lobby.payerCrashed(currentTurn, players);
+            currentMove = lastMove;
+            return;
+        }
+
+        int c = 0;
         while (currentMove == null) {
             try {
+                if (c < 300) {
+                    c++;
+                } else {
+                    Lobby.payerCrashed(currentTurn, players);
+                    if (players.values().stream().filter(cup -> cup.getDiceNumber() > 0).count() > 1)
+                        currentMove = lastMove;
+                    else
+                        currentMove = new Doubt(currentTurn);
+                    return;
+                }
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -65,31 +95,51 @@ public class Turno {
 
         GameClient player = currentMove.getPlayer();
         if (!GameHelper.validateMove(currentMove, lastMove)) {
-            player.imbroglio();
+            try {
+                player.imbroglio();
+            } catch (RemoteException e) {
+                Lobby.payerCrashed(player, players);
+            }
+
             players.get(player).disqualify();
             currentMove = lastMove;
             return;
         }
 
-        for (GameClient p : players.keySet())
-            if (p != player)
-                p.opponentMove(currentMove);
+        for (Map.Entry<GameClient, DiceCup> entry : players.entrySet()) {
+            GameClient p = entry.getKey();
+            if (p != player && !entry.getValue().isCrashed()) {
+                try {
+                    p.opponentMove(currentMove);
+                } catch (RemoteException e) {
+                    Lobby.payerCrashed(p, players);
+                    if (players.values().stream().filter(cup -> cup.getDiceNumber() > 0).count() <= 1) {
+                        currentMove = new Doubt(null);
+                    }
+                }
+            }
+        }
+
         return;
     }
 
-    private void flipCups() throws RemoteException {
+    private void flipCups() {
         for (Map.Entry<GameClient, DiceCup> playerCup : players.entrySet()) {
             GameClient player = playerCup.getKey();
             DiceCup cup = playerCup.getValue();
             if (cup.getDiceNumber() > 0) {
-                player.flipped(cup.flip());
-                System.out.println(player.getName() + " ha girato il bicchiere");
+                try {
+                    player.flipped(cup.flip());
+                    System.out.println(player.getName() + " ha girato il bicchiere");
+                } catch (RemoteException e) {
+                    Lobby.payerCrashed(player, players);
+                }
             }
         }
         System.out.println("Tutti i giocatori hanno flippato il proprio bicchiere");
     }
 
-    private GameClient nextPlayer() throws RemoteException {
+    private GameClient nextPlayer() {
         ArrayList<GameClient> lstPlayer = new ArrayList<>(players.keySet());
         System.out.print("E' il turno di ");
         GameClient player = lstPlayer.get(rotationIndex);
@@ -97,7 +147,11 @@ public class Turno {
             rotationIndex = (rotationIndex + 1) % players.size();
             player = lstPlayer.get(rotationIndex);
         }
-        System.out.println(player.getName());
+        try {
+            System.out.println(player.getName());
+        } catch (RemoteException e) {
+            Lobby.payerCrashed(player, players);
+        }
         rotationIndex = (rotationIndex + 1) % players.size();
 
         return player;
@@ -105,8 +159,6 @@ public class Turno {
 
     public void playerMoves(Move move) throws RemoteException {
         GameClient player = move.getPlayer();
-        // System.out.println("[DEBUG]" + player.getName() + " == " +
-        // currentTurn.getName());
         if (!currentTurn.equals(player)) {
             player.notYourTurn();
             return;

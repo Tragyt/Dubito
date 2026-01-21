@@ -6,28 +6,33 @@ import java.util.Map;
 public class Game {
     private LinkedHashMap<GameClient, DiceCup> players;
     private int rotationIndex;
-    private int playersInGame;
     private Turno turn;
 
     public Game(LinkedHashMap<GameClient, DiceCup> players) {
         this.players = players;
-        playersInGame = players.size();
-        rotationIndex = (int) (Math.random() * playersInGame);
+        rotationIndex = (int) (Math.random() * players.size());
     }
 
-    public GameClient startGame() throws RemoteException {
+    public GameClient startGame() {
         ArrayList<Map.Entry<GameClient, DiceCup>> lst = new ArrayList<>(players.entrySet());
-        while (playersInGame > 1) {
+        while (players.values().stream().filter(cup -> cup.getDiceNumber() > 0).count() > 1) {
             turn = new Turno(players, rotationIndex);
             rotationIndex = turn.startTurn();
 
-            Map.Entry<GameClient, DiceCup> entry = lst.get(rotationIndex);
-            int dicesLeft = entry.getValue().removeDice();
-            GameClient looser = entry.getKey();
-            looser.diceLost(dicesLeft);
-            if (dicesLeft == 0) {
-                looser.youLost();
-                playersInGame--;
+            if (rotationIndex != -1) {
+                Map.Entry<GameClient, DiceCup> entry = lst.get(rotationIndex);
+                DiceCup looserCup = entry.getValue();
+                GameClient looser = entry.getKey();
+                int dicesLeft = looserCup.removeDice();
+                if (!looserCup.isCrashed()) {
+                    try {
+                        looser.diceLost(dicesLeft);
+                        if (dicesLeft == 0)
+                            looser.youLost();
+                    } catch (RemoteException e) {
+                        Lobby.payerCrashed(looser, players);
+                    }
+                }
             }
         }
         return getWinner();

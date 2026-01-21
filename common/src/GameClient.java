@@ -32,4 +32,6 @@ public interface GameClient extends Remote {
     void endTurn(String looser, int dicesLeft, int faceCalled, int facesRealNumber) throws RemoteException;
 
     void notYourTurn() throws RemoteException;
+
+    void playerCrashed(String playername) throws RemoteException;
 }

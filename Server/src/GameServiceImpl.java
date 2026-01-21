@@ -56,6 +56,7 @@ public class GameServiceImpl extends UnicastRemoteObject implements GameService 
             try {
                 lobby.startGame();
             } catch (RemoteException e) {
+                lobby.endGame();
                 System.out.println("Si è verificato un errore");
             }
         }).start();

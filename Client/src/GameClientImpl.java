@@ -167,15 +167,16 @@ public class GameClientImpl extends UnicastRemoteObject implements GameClient {
 
     @Override
     public void opponentMove(Move move) throws RemoteException {
-        if (move instanceof Doubt)
-            System.out.println(AnsiColor.YELLOW + move.getPlayer().getName() + " dubita" + AnsiColor.RESET);
-        else {
-            Raise raise = (Raise) move;
-            System.out.println(AnsiColor.YELLOW +
-                    "Secondo " + move.getPlayer().getName() + " ci sono almeno " + raise.getDicesNumber()
-                    + " [" + raise.getFace() + "]" + AnsiColor.RESET);
+        if (move != null && move.getPlayer() != null) {
+            if (move instanceof Doubt)
+                System.out.println(AnsiColor.YELLOW + move.getPlayer().getName() + " dubita" + AnsiColor.RESET);
+            else {
+                Raise raise = (Raise) move;
+                System.out.println(AnsiColor.YELLOW +
+                        "Secondo " + move.getPlayer().getName() + " ci sono almeno " + raise.getDicesNumber()
+                        + " [" + raise.getFace() + "]" + AnsiColor.RESET);
+            }
         }
-
     }
 
     @Override
@@ -186,7 +187,7 @@ public class GameClientImpl extends UnicastRemoteObject implements GameClient {
 
     @Override
     public void winner(String winner) throws RemoteException {
-        System.out.println(AnsiColor.RED + "Il vincitore è" + winner + "!!" + AnsiColor.RESET);
+        System.out.println(AnsiColor.RED + "Il vincitore è " + winner + "!!" + AnsiColor.RESET);
         game = false;
     }
 
@@ -216,5 +217,10 @@ public class GameClientImpl extends UnicastRemoteObject implements GameClient {
     @Override
     public void notYourTurn() throws RemoteException {
         System.out.println(AnsiColor.RED + "Non è il tuo turno" + AnsiColor.RESET);
+    }
+
+    @Override
+    public void playerCrashed(String playername) throws RemoteException {
+        System.out.println(AnsiColor.RED + playername + " è uscito dalla partita");
     }
 }
