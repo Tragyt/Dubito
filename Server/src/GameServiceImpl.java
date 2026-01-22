@@ -8,7 +8,7 @@ public class GameServiceImpl extends UnicastRemoteObject implements GameService 
     private final Lobby lobby;
     private ScheduledFuture<?> countdown;
     private boolean countdownStarted;
-    private static final int COUNTDOWN_SECONDS = 10;
+    private static final int COUNTDOWN_SECONDS = Integer.parseInt(System.getenv("LOBBY_TIMER_SECONDS"));
 
     public GameServiceImpl() throws RemoteException {
         lobby = new Lobby();

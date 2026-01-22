@@ -8,6 +8,7 @@ public class Turno {
     private int rotationIndex;
     private volatile GameClient currentTurn;
     private volatile Move currentMove;
+    private final int CRASH_TIME = Integer.parseInt(System.getenv("CRASH_TIMER_SECONDS"));
 
     public Turno(LinkedHashMap<GameClient, DiceCup> players, int rotationIndex) {
         this.players = players;
@@ -77,7 +78,7 @@ public class Turno {
         int c = 0;
         while (currentMove == null) {
             try {
-                if (c < 300) {
+                if (c < (CRASH_TIME * 10)) {
                     c++;
                 } else {
                     Lobby.payerCrashed(currentTurn, players);

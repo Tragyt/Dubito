@@ -1,16 +1,18 @@
 services:
   gameserver:
-    build: 
+    build:
       context: .
       dockerfile: Server/Dockerfile
     container_name: gameserver
     networks:
       - rmi-net
     environment:
-      - APP_ENV=dev
-  
+      MAX_PLAYER: ${MAX_PLAYER:-4}
+      LOBBY_TIMER_SECONDS: ${LOBBY_TIMER_SECONDS:-30}
+      CRASH_TIMER_SECONDS: ${CRASH_TIMER_SECONDS:-60}
+
   player:
-    build: 
+    build:
       context: .
       dockerfile: Client/Dockerfile
     container_name: player
@@ -18,7 +20,7 @@ services:
       - rmi-net
     environment:
       - APP_ENV=dev
-    stdin_open: true   
+    stdin_open: true
     tty: true
 
 networks:

@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Lobby {
-    private static final int MAX_PLAYERS = 3;
+    private static final int MAX_PLAYERS = Integer.parseInt(System.getenv("MAX_PLAYER"));
     private LinkedHashMap<GameClient, DiceCup> players;
     private boolean gameStarted;
     private Game game;
